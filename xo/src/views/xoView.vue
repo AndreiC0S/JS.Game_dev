@@ -26,8 +26,9 @@ function equalsRow(indexRow){
     return true;
 }
 function equalsCol(indexCol){
-    
+    const line = tabla[indexCol]
     const ref = tabla[0][indexCol];
+    if(ref === "") return;
     for(let i = 1; i < tabla.length; i++){
         if(ref !== tabla[i][indexCol]){
             return false;
@@ -37,6 +38,7 @@ function equalsCol(indexCol){
 }
 function principal(){
     const ref = tabla[0][0];
+    if(ref === "") return;
     for (let i = 0; i < tabla.length; i++){
         if(ref !== tabla[i][i]) return false;
     }
@@ -45,14 +47,22 @@ function principal(){
 }
 
 function secundar(){
-    const ref = tabla[0][tabla.length];
+    const ref = tabla[0][tabla.length-1];
+    if(ref === "") return;
     for (let i = 1; i < tabla.length; i++){
-        if(ref !== tabla[i][tabla.length- i - 1]) return false;
+        if(ref !== tabla[i][tabla.length - i - 1]) return false;
     }
     return true;
 
 }
-function clickCell(row,col){
+
+function endGame(){
+    gameOver = true;
+    alert(valori[indexMutare] + ' a castigat')
+}
+function clickCell(row,col,cellId){
+
+    
     if(gameOver){
         return 
     }
@@ -65,9 +75,19 @@ function clickCell(row,col){
     }
     tabla[row][col] = valori[indexMutare];
 
-    if(equalsRow(row) || equalsCol(col) || principal()|| secundar()){
-        gameOver = true;
-        alert(valori[indexMutare] + ' a castigat')
+    const cellElem = document.getElementById(cellId);
+    cellElem.classList.add('animate__animated', 'animate__heartBeat');
+    // anime({
+    //     targets: '#' + cellId,
+    //     translateY: 50
+    // });
+
+
+    if(equalsRow(row) || 
+       equalsCol(col) || 
+       (row === col && principal()) || 
+       (col === tabla.length - row - 1 && secundar())){
+        endGame()
     }
 
     indexMutare++;
@@ -90,7 +110,7 @@ function clickCell(row,col){
     <table>
         <tbody>
             <tr v-for="(row, indexRow ) in tabla " v-bind:key="indexRow"   >
-                <td v-for="(cell, indexCol) in row" class="cell" @click="clickCell(indexRow,indexCol) "  v-bind:key="indexCol">
+                <td v-bind:id="'cell-' + indexRow + '-' + indexCol" v-for="(cell, indexCol) in row" class="cell " @click="clickCell(indexRow,indexCol,'cell-' + indexRow + '-' + indexCol) "  v-bind:key="indexCol">
                     <span v-if="cell !== '' ">
                         {{ cell }}
                     </span>
@@ -110,6 +130,7 @@ function clickCell(row,col){
 
 .cell{
     border: 1px solid black;
+    background-color: white;
     padding: 1rem;
     font-size: 2rem;
     text-align: center;
